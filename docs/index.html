@@ -16,35 +16,12 @@
 	<link rel="stylesheet" href="//unpkg.com/@catppuccin/highlightjs/css/catppuccin-frappe.css">
 
 	<style>
-		.container {
-			display: grid;
-			grid-template-columns: 0.4fr 0.2fr 0.4fr;
-			grid-template-rows: 0.5fr 1fr;
-			gap: 0px 0px;
-			grid-template-areas:
-				"header header header"
-				"left middle right";
-			justify-items: center;
-			align-items: center;
-		}
-
-		.header {
-			grid-area: header;
-		}
-
-		.left {
-			grid-area: left;
-			text-align: left;
-		}
-
-		.middle {
-			grid-area: middle;
-			text-align: center;
-		}
-
-		.right {
-			grid-area: right;
-			text-align: left;
+		.circle {
+			background-color: #586e75;
+			width: 40px;
+			height: 40px;
+			border-radius: 20px;
+			margin: 10px;
 		}
 	</style>
 </head>
@@ -52,25 +29,11 @@
 <body>
 	<div class="reveal">
 		<div class="slides">
-			<section>
+			<section
+				data-background-image="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Ferrer_partitioning_diagrams.svg/1280px-Ferrer_partitioning_diagrams.svg.png"
+				data-background-size="580px">
+
 				<h2 class="r-fit-text">Integer Partitioning</h2>
-			</section>
-			<section>
-				<span class="r-fit-text">
-					\[\begin{aligned}
-					6 \\
-					5 + 1 &= \\
-					4 + 2 &= \\
-					4 + 1 + 1 &= \\
-					3 + 3 &= \\
-					3 + 2 + 1 &= \\
-					3 + 1 + 1 + 1 &= \\
-					2 + 2 + 2 &= \\
-					2 + 2 + 1 + 1 &= \\
-					2 + 1 + 1 + 1 + 1 &= \\
-					1 + 1 + 1 + 1 + 1 + 1 &=
-					\end{aligned} \]
-				</span>
 			</section>
 			<section>
 				<h2>Generate all the partitions</h2>
@@ -91,40 +54,54 @@ generatePartitions m = recursivePartition m m 0 []
 					- m is the size of the not chosen values
 				</aside>
 			</section>
-			<section>
+			<section data-auto-animate>
 				<h2>Ferres-Young diagram</h2>
-				<h2>
-					\[
-					7 = 4 + 2 + 1
-					\]
-				</h2>
+				<p>7 = </p>
 			</section>
-			<section>
+			<section data-auto-animate>
 				<h2>Ferres-Young diagram</h2>
-				<h2>
-					\[
-					4 \\
-					2 \\
-					1 \\
-					\]
-				</h2>
+				<p>7 = </p>
+				<p data-id="4">4</p> + <p data-id="2">2</p> + <p data-id="1">1</p>
 			</section>
-			<section>
-				<div class="container">
-					<h2 class="header r-fit-text">Ferres-Young diagram</h2>
-					<div class="left">
-						o o o o <br />
-						o o <br />
-						o
+			<section data-auto-animate">
+				<h2>Ferres-Young diagram</h2>
+				<div class="r-fit-text items-center">
+					<div class="r-vstack items-start">
+						<div class="r-hstack">
+							<div class="circle"></div>
+							<div class="circle"></div>
+							<div class="circle"></div>
+							<div class="circle"></div>
+						</div>
+						<div class="r-hstack">
+							<div class="circle"></div>
+							<div class="circle"></div>
+						</div>
+						<div class="r-hstack">
+							<div class="circle"></div>
+						</div>
 					</div>
-					<div class="middle">
-						➡️
-					</div>
-					<div class="right">
-						o o o <br />
-						o o <br />
-						o <br />
-						o <br />
+				</div>
+			</section>
+			<section data-auto-animate">
+				<h2>Ferres-Young diagram</h2>
+				<div class="r-fit-text items-center">
+					<div class="r-vstack items-start">
+						<div class="r-hstack">
+							<div class="circle"></div>
+							<div class="circle"></div>
+							<div class="circle"></div>
+						</div>
+						<div class="r-hstack">
+							<div class="circle"></div>
+							<div class="circle"></div>
+						</div>
+						<div class="r-hstack">
+							<div class="circle"></div>
+						</div>
+						<div class="r-hstack">
+							<div class="circle"></div>
+						</div>
 					</div>
 				</div>
 			</section>
@@ -133,7 +110,7 @@ generatePartitions m = recursivePartition m m 0 []
 			</section>
 			<section>
 				<h2>Generate all the partitions #2</h2>
-				<pre><code class="language-haskell data-trim">
+				<pre><code class="language-haskell" data-trim>
 generatePartitions2 m n = recursivePartition (m - n) n 1 [n]
 				</code></pre>
 			</section>
@@ -143,7 +120,7 @@ generatePartitions2 m n = recursivePartition (m - n) n 1 [n]
 			</section>
 			<section>
 				<h2>Conjugation</h2>
-				<pre><code class="language-haskell data-trim">
+				<pre><code class="language-haskell" data-trim>
 conjugatePartitionRec :: [Int] -> [Int] -> [Int]
 conjugatePartitionRec partition conjPartition
   | any (> 0) partition = 
@@ -157,7 +134,7 @@ conjugatePartition partition = conjugatePartitionRec partition []
 			</section>
 			<section>
 				<h2>Generate all the partitions #3</h2>
-				<pre><code class="language-haskell data-trim">
+				<pre><code class="language-haskell" data-trim>
 recursivePartition2 :: Int -> Int -> Int -> [Int] -> [[Int]]
 recursivePartition2 0 _ _ partition = 
 	[conjugatePartition partition]
@@ -170,8 +147,7 @@ generatePartitions3 :: Int -> Int -> [[Int]]
 generatePartitions3 m n = recursivePartition2 (m - n) n 1 [n]
 				</code></pre>
 			</section>
-			<section>
-				<img src="table.png" />
+			<section data-background-image="table.png" data-background-size="50%">
 			</section>
 			<section>
 				\[
@@ -185,7 +161,7 @@ generatePartitions3 m n = recursivePartition2 (m - n) n 1 [n]
 			</section>
 			<section>
 				<h2>Find the amount of partitions #1</h2>
-				<pre><code class="language-haskell data-trim">
+				<pre><code class="language-haskell" data-trim data-line-numbers="2-3|4-9">
 enumeratePartitions :: Int -> Int -> Int
 enumeratePartitions 0 0 = 1
 enumeratePartitions _ 0 = 0
@@ -199,7 +175,7 @@ enumeratePartitions m n = enumeratePartitions (m - 1) (n - 1)
 			</section>
 			<section>
 				<h2>Find the amount of partitions #2</h2>
-				<pre><code class="language-haskell data-trim">
+				<pre><code class="language-haskell" data-trim data-line-numbers="2-4|5-12|14-20">
 enumeratePartitionsLoop i m j n table
   | i == (m + 1) = table
   | j == min i n + 1 = 
@@ -212,11 +188,7 @@ enumeratePartitionsLoop i m j n table
 		addIfIGtJ
 		  | i < 2 * j = 0
 		  | otherwise = table !! (i - j) !! j
-				</code></pre>
-			</section>
-			<section>
-				<h2>Find the amount of partitions #2</h2>
-				<pre><code class="language-haskell data-trim">
+
 enumeratePartitions' :: Int -> Int -> [[Int]]
 enumeratePartitions' m n = map tail $ drop 1 $ 
 		enumeratePartitionsLoop 1 m 1 n initTable
@@ -226,11 +198,11 @@ enumeratePartitions' m n = map tail $ drop 1 $
 	el _ _ = 0
 				</code></pre>
 			</section>
-			<section>
+			<section data-transition="slide-in fade-out">
 				<h2>Find the amount of partitions #3</h2>
 				<img src="amnt_partitions.png" />
 			</section>
-			<section>
+			<section data-transition="fade-in slide-out">
 				<h2>Find the amount of partitions #3</h2>
 				\[
 				P(m) = \sum_{j \in \Z \setminus \{0\}} (-1)^{j + 1} * P(m - \frac{j(3j -1)}{2})
@@ -238,7 +210,7 @@ enumeratePartitions' m n = map tail $ drop 1 $
 			</section>
 			<section>
 				<h2>Lexicographic Ordering</h2>
-				<pre><code class="language-haskell data-trim">
+				<pre><code class="language-haskell" data-trim data-line-numbers="1-5|7|7-9|7-11|4-12">
 partitionLexSuccessor :: Int -> Int -> [Int] -> Maybe [Int]
 partitionLexSuccessor m n partition
   | i == n + 1 = Nothing
@@ -255,16 +227,12 @@ partitionLexSuccessor m n partition
 			</section>
 			<section>
 				<h2>partition ➡️ rank</h2>
-				<pre><code class="language-haskell data-trim">
+				<pre><code class="language-haskell" data-trim data-line-numbers="1-4|7|8-10|14-17|8,11-13">
 partitionLexRank :: Int -> Int -> [Int] -> Int
 partitionLexRank m n partition = 
 		partitionLexRankHelp m n partition 
 				(enumeratePartitions' m n) 0
-				</code></pre>
-			</section>
-			<section>
-				<h2>partition ➡️ rank</h2>
-				<pre><code class="language-haskell data-trim">
+
 partitionLexRankHelp :: Int -> Int -> [Int] -> [[Int]] -> Int -> Int
 partitionLexRankHelp 0 _ _ _ rank = rank
 partitionLexRankHelp m n partition p rank
@@ -275,21 +243,19 @@ partitionLexRankHelp m n partition p rank
 				(rank + p !! (m - 2) !! (n - 2))
   where
 		decrementedPartition = 
-				map (subtract 1) (take n partition) ++ drop n partition
+				map (subtract 1) (take n partition) 
+						++ drop n partition
 				</code></pre>
 			</section>
 			<section>
 				<h2>rank ➡️ partition</h2>
-				<pre><code class="language-haskell data-trim">
+				<pre><code class="language-haskell" data-trim data-line-numbers="1-4|14-17|8,13|10,18">
 partitionLexUnrank :: Int -> Int -> Int -> [Int]
 partitionLexUnrank m n = 
 		partitionLexUnrankHelp m n (replicate n 0) 
 				(enumeratePartitions' m n)		
-				</code></pre>
-			</section>
-			<section>
-				<h2>rank ➡️ partition</h2>
-				<pre><code class="language-haskell data-trim">partitionLexUnrankHelp 0 _ partition _ _ = partition
+
+partitionLexUnrankHelp 0 _ partition _ _ = partition
 partitionLexUnrankHelp m n partition p rank
   | rank < topLeftP = 
   		partitionLexUnrankHelp (m - 1) (n - 1) 
@@ -303,10 +269,29 @@ partitionLexUnrankHelp m n partition p rank
 		  | otherwise = p !! (m - 2) !! (n - 2)
 		(left, right) = splitAt (n - 1) partition
 		incrementedPartition = map (+ 1) (take n partition) 
-				++ drop n partition</code></pre>
+				++ drop n partition
+				</code></pre>
 			</section>
-			<section>
+			<section data-auto-animate>
+				<ul>
+					<li>Generating all the partitions</li>
+					<li>Generating all the partitions of m into n parts</li>
+					<li>Get the amount of partitions</li>
+					<li>Get the successor</li>
+					<li>Get the rank from a partition</li>
+					<li>Get the partition from a rank</li>
+				</ul>
+			</section>
+			<section data-auto-animate>
 				<h2 class="r-fit-text">Integer Partitioning</h2>
+				<ul>
+					<li>Generating all the partitions</li>
+					<li>Generating all the partitions of m into n parts</li>
+					<li>Get the amount of partitions</li>
+					<li>Get the successor</li>
+					<li>Get the rank from a partition</li>
+					<li>Get the partition from a rank</li>
+				</ul>
 			</section>
 		</div>
 	</div>
