@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>reveal.js</title>
+
+	<link rel="stylesheet" href="dist/reset.css">
+	<link rel="stylesheet" href="dist/reveal.css">
+	<link rel="stylesheet" href="dist/theme/solarized.css">
+
+	<!-- Theme used for syntax highlighted code -->
+	<!-- <link rel="stylesheet" href="plugin/highlight/zenburn.css"> -->
+	<link rel="stylesheet" href="//unpkg.com/@catppuccin/highlightjs/css/catppuccin-frappe.css">
+
+	<style>
+		.container {
+			display: grid;
+			grid-template-columns: 0.4fr 0.2fr 0.4fr;
+			grid-template-rows: 0.5fr 1fr;
+			gap: 0px 0px;
+			grid-template-areas:
+				"header header header"
+				"left middle right";
+			justify-items: center;
+			align-items: center;
+		}
+
+		.header {
+			grid-area: header;
+		}
+
+		.left {
+			grid-area: left;
+			text-align: left;
+		}
+
+		.middle {
+			grid-area: middle;
+			text-align: center;
+		}
+
+		.right {
+			grid-area: right;
+			text-align: left;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="reveal">
+		<div class="slides">
+			<section>
+				<h2 class="r-fit-text">Integer Partitioning</h2>
+			</section>
+			<section>
+				<span class="r-fit-text">
+					\[\begin{aligned}
+					6 \\
+					5 + 1 &= \\
+					4 + 2 &= \\
+					4 + 1 + 1 &= \\
+					3 + 3 &= \\
+					3 + 2 + 1 &= \\
+					3 + 1 + 1 + 1 &= \\
+					2 + 2 + 2 &= \\
+					2 + 2 + 1 + 1 &= \\
+					2 + 1 + 1 + 1 + 1 &= \\
+					1 + 1 + 1 + 1 + 1 + 1 &=
+					\end{aligned} \]
+				</span>
+			</section>
+			<section>
+				<h2>Generate all the partitions</h2>
+				<pre><code class="language-haskell data-trim">
+recursivePartition :: Int -> Int -> Int -> [Int] -> [[Int]]
+recursivePartition 0 _ _ partition = [partition]
+recursivePartition m upperBound n partition = 
+	concatMap 
+		(\i -> recursivePartition (m - i) i (n + 1) $ 
+			partition ++ [i]) 
+		[1 .. min upperBound m]
+
+generatePartitions :: Int -> [[Int]]
+generatePartitions m = recursivePartition m m 0 []
+				</code></pre>
+				<aside class="notes">
+					- The upper bound determines the size of the next part to be chosen.
+					- m is the size of the not chosen values
+				</aside>
+			</section>
+			<section>
+				<h2>Ferres-Young diagram</h2>
+				<h2>
+					\[
+					7 = 4 + 2 + 1
+					\]
+				</h2>
+			</section>
+			<section>
+				<h2>Ferres-Young diagram</h2>
+				<h2>
+					\[
+					4 \\
+					2 \\
+					1 \\
+					\]
+				</h2>
+			</section>
+			<section>
+				<div class="container">
+					<h2 class="header r-fit-text">Ferres-Young diagram</h2>
+					<div class="left">
+						o o o o <br />
+						o o <br />
+						o
+					</div>
+					<div class="middle">
+						➡️
+					</div>
+					<div class="right">
+						o o o <br />
+						o o <br />
+						o <br />
+						o <br />
+					</div>
+				</div>
+			</section>
+			<section>
+				\[ P(m, n) = \text{Amount of partitions of m} \\ \text{having n parts} \]
+			</section>
+			<section>
+				<h2>Generate all the partitions #2</h2>
+				<pre><code class="language-haskell data-trim">
+generatePartitions2 m n = recursivePartition (m - n) n 1 [n]
+				</code></pre>
+			</section>
+			<section>
+				<h2>Conjugation</h2>
+				<img src="conjugation.png" />
+			</section>
+			<section>
+				<h2>Conjugation</h2>
+				<pre><code class="language-haskell data-trim">
+conjugatePartitionRec :: [Int] -> [Int] -> [Int]
+conjugatePartitionRec partition conjPartition
+  | any (> 0) partition = 
+  		conjugatePartitionRec (map (subtract 1) partition) $ 
+			conjPartition ++ [length $ filter (> 0) partition]
+  | otherwise = conjPartition
+
+conjugatePartition :: [Int] -> [Int]
+conjugatePartition partition = conjugatePartitionRec partition []
+				</code></pre>
+			</section>
+			<section>
+				<h2>Generate all the partitions #3</h2>
+				<pre><code class="language-haskell data-trim">
+recursivePartition2 :: Int -> Int -> Int -> [Int] -> [[Int]]
+recursivePartition2 0 _ _ partition = 
+	[conjugatePartition partition]
+recursivePartition2 m upperBound n partition = 
+	concatMap (\i -> recursivePartition2 (m - i) i (n + 1) $ 
+				partition ++ [i]) [1 .. min upperBound m]
+					
+-- Generate all the partitions of m into n parts
+generatePartitions3 :: Int -> Int -> [[Int]]
+generatePartitions3 m n = recursivePartition2 (m - n) n 1 [n]
+				</code></pre>
+			</section>
+			<section>
+				<img src="table.png" />
+			</section>
+			<section>
+				\[
+				\forall m, n \in \N, m \ge n : P(m, n) = \\
+				P(m - 1, n - 1) + P(m - n, n)
+				\]
+
+				\[
+				P(m, n) = \sum^n_{i = 1} P(m - n, i)
+				\]
+			</section>
+			<section>
+				<h2>Find the amount of partitions #1</h2>
+				<pre><code class="language-haskell data-trim">
+enumeratePartitions :: Int -> Int -> Int
+enumeratePartitions 0 0 = 1
+enumeratePartitions _ 0 = 0
+enumeratePartitions m n = enumeratePartitions (m - 1) (n - 1) 
+													+ addIfMGtN
+  where
+	addIfMGtN
+	  | m < 2 * n = 0
+	  | otherwise = enumeratePartitions (m - n) n
+				</code></pre>
+			</section>
+			<section>
+				<h2>Find the amount of partitions #2</h2>
+				<pre><code class="language-haskell data-trim">
+enumeratePartitionsLoop i m j n table
+  | i == (m + 1) = table
+  | j == min i n + 1 = 
+			enumeratePartitionsLoop (i + 1) m 1 n table
+  | otherwise = 
+  		enumeratePartitionsLoop i m (j + 1) n $ 
+				flip (updateTable table) (i, j) $ 
+						table !! (i - 1) !! (j - 1) + addIfIGtJ
+  where
+		addIfIGtJ
+		  | i < 2 * j = 0
+		  | otherwise = table !! (i - j) !! j
+				</code></pre>
+			</section>
+			<section>
+				<h2>Find the amount of partitions #2</h2>
+				<pre><code class="language-haskell data-trim">
+enumeratePartitions' :: Int -> Int -> [[Int]]
+enumeratePartitions' m n = map tail $ drop 1 $ 
+		enumeratePartitionsLoop 1 m 1 n initTable
+  where
+	initTable = [map (el j) [0 .. n] | j <- [0 .. m]]
+	el 0 0 = 1
+	el _ _ = 0
+				</code></pre>
+			</section>
+			<section>
+				<h2>Find the amount of partitions #3</h2>
+				<img src="amnt_partitions.png" />
+			</section>
+			<section>
+				<h2>Find the amount of partitions #3</h2>
+				\[
+				P(m) = \sum_{j \in \Z \setminus \{0\}} (-1)^{j + 1} * P(m - \frac{j(3j -1)}{2})
+				\]
+			</section>
+			<section>
+				<h2>Lexicographic Ordering</h2>
+				<pre><code class="language-haskell data-trim">
+partitionLexSuccessor :: Int -> Int -> [Int] -> Maybe [Int]
+partitionLexSuccessor m n partition
+  | i == n + 1 = Nothing
+  | otherwise = Just $ newHead : newMatched 
+  							++ drop (i + 1) partition
+  where
+    lastMatch = takeWhile1Bigger partition -- a_1 <= a_i + 1
+    i = length lastMatch
+    mismatchedElement = partition !! i + 1
+    -- 2 -> 1 because we're 0-indexed
+    newHead = sum lastMatch - (i - 1) * mismatchedElement - 1
+    newMatched = replicate i mismatchedElement
+				</code></pre>
+			</section>
+			<section>
+				<h2>partition ➡️ rank</h2>
+				<pre><code class="language-haskell data-trim">
+partitionLexRank :: Int -> Int -> [Int] -> Int
+partitionLexRank m n partition = 
+		partitionLexRankHelp m n partition 
+				(enumeratePartitions' m n) 0
+				</code></pre>
+			</section>
+			<section>
+				<h2>partition ➡️ rank</h2>
+				<pre><code class="language-haskell data-trim">
+partitionLexRankHelp :: Int -> Int -> [Int] -> [[Int]] -> Int -> Int
+partitionLexRankHelp 0 _ _ _ rank = rank
+partitionLexRankHelp m n partition p rank
+  | partition !! (n - 1) == 1 = 
+  		partitionLexRankHelp (m - 1) (n - 1) partition p rank
+  | otherwise = 
+  		partitionLexRankHelp (m - n) n decrementedPartition p 
+				(rank + p !! (m - 2) !! (n - 2))
+  where
+		decrementedPartition = 
+				map (subtract 1) (take n partition) ++ drop n partition
+				</code></pre>
+			</section>
+			<section>
+				<h2>rank ➡️ partition</h2>
+				<pre><code class="language-haskell data-trim">
+partitionLexUnrank :: Int -> Int -> Int -> [Int]
+partitionLexUnrank m n = 
+		partitionLexUnrankHelp m n (replicate n 0) 
+				(enumeratePartitions' m n)		
+				</code></pre>
+			</section>
+			<section>
+				<h2>rank ➡️ partition</h2>
+				<pre><code class="language-haskell data-trim">partitionLexUnrankHelp 0 _ partition _ _ = partition
+partitionLexUnrankHelp m n partition p rank
+  | rank < topLeftP = 
+  		partitionLexUnrankHelp (m - 1) (n - 1) 
+				(left ++ [head right + 1] ++ tail right) p rank
+  | otherwise = 
+  		partitionLexUnrankHelp (m - n) n 
+				incrementedPartition p (rank - topLeftP)
+  where
+		topLeftP
+		  | m == 1 = p !! (m - 1) !! (n - 1)
+		  | otherwise = p !! (m - 2) !! (n - 2)
+		(left, right) = splitAt (n - 1) partition
+		incrementedPartition = map (+ 1) (take n partition) 
+				++ drop n partition</code></pre>
+			</section>
+			<section>
+				<h2 class="r-fit-text">Integer Partitioning</h2>
+			</section>
+		</div>
+	</div>
+
+	<script src="dist/reveal.js"></script>
+	<script src="plugin/notes/notes.js"></script>
+	<script src="plugin/markdown/markdown.js"></script>
+	<script src="plugin/highlight/highlight.js"></script>
+	<script src="plugin/math/math.js"></script>
+	<script>
+		// More info about initialization & config:
+		// - https://revealjs.com/initialization/
+		// - https://revealjs.com/config/
+		Reveal.initialize({
+			hash: true,
+
+			// Learn about plugins: https://revealjs.com/plugins/
+			plugins: [RevealMarkdown, RevealHighlight, RevealNotes, RevealMath.KaTeX]
+		});
+	</script>
+</body>
+
+</html>
